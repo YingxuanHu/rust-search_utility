@@ -156,26 +156,51 @@ impl Config {
         let mut colored = false;
         let mut pattern: Option<String> = None;
         let mut inputs: Vec<String> = Vec::new();
+        let mut options_done = false;
 
         for arg in args {
-            match arg.as_str() {
-                "-h" | "--help" => {
-                    print_usage();
-                    return Ok(ParseOutcome::HelpPrinted);
-                }
-                "-i" => case_insensitive = true,
-                "-n" => show_line_numbers = true,
-                "-v" => invert_match = true,
-                "-r" => recursive = true,
-                "-f" => show_filenames = true,
-                "-c" => colored = true,
-                _ => {
-                    if pattern.is_none() {
-                        pattern = Some(arg);
-                    } else {
-                        inputs.push(arg);
+            if !options_done {
+                match arg.as_str() {
+                    "-h" | "--help" => {
+                        print_usage();
+                        return Ok(ParseOutcome::HelpPrinted);
                     }
+                    "-i" => {
+                        case_insensitive = true;
+                        continue;
+                    }
+                    "-n" => {
+                        show_line_numbers = true;
+                        continue;
+                    }
+                    "-v" => {
+                        invert_match = true;
+                        continue;
+                    }
+                    "-r" => {
+                        recursive = true;
+                        continue;
+                    }
+                    "-f" => {
+                        show_filenames = true;
+                        continue;
+                    }
+                    "-c" => {
+                        colored = true;
+                        continue;
+                    }
+                    "--" => {
+                        options_done = true;
+                        continue;
+                    }
+                    _ => {}
                 }
+            }
+
+            if pattern.is_none() {
+                pattern = Some(arg);
+            } else {
+                inputs.push(arg);
             }
         }
 
